@@ -1,0 +1,1768 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CRIQ — Agenda Criptográfica Segura</title>
+  <!-- Google Fonts: Inter para UI, Fira Code para hashes -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    /* ==========================================================================
+       VARIABLES DE DISEÑO Y CONFIGURACIÓN (TEMA CLÍNICO PREMIUM)
+       ========================================================================== */
+    :root {
+      --primary: #1a3a5c;          /* Azul médico oscuro */
+      --primary-light: #2c5270;    /* Azul secundario */
+      --primary-bg: #f5f8fa;       /* Fondo clínico claro */
+      --success: #2ecc71;          /* Verde verificado */
+      --success-glow: rgba(46, 204, 113, 0.2);
+      --danger: #e74c3c;           /* Rojo alerta */
+      --danger-glow: rgba(231, 76, 60, 0.2);
+      --warning: #f39c12;          /* Naranja modificar */
+      --warning-glow: rgba(243, 156, 18, 0.2);
+      --white: #ffffff;
+      --gray-dark: #334155;
+      --gray-light: #cbd5e1;
+      --gray-bg: #f8fafc;
+      --border-radius: 12px;
+      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-mono: 'Fira Code', 'Courier New', monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-ui);
+      background-color: var(--primary-bg);
+      color: var(--gray-dark);
+      line-height: 1.5;
+      padding: 24px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    /* ==========================================================================
+       SCROLLBAR PERSONALIZADO
+       ========================================================================== */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--gray-bg);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--gray-light);
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--primary-light);
+    }
+
+    /* ==========================================================================
+       ESTRUCTURA DE DISEÑO (GRID PRINCIPAL)
+       ========================================================================== */
+    header {
+      background: var(--white);
+      padding: 20px 32px;
+      border-radius: var(--border-radius);
+      box-shadow: 0 4px 20px rgba(26, 58, 92, 0.05);
+      border: 1px solid rgba(26, 58, 92, 0.08);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .logo-container {
+      width: 48px;
+      height: 48px;
+      background: var(--primary);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--white);
+      box-shadow: 0 4px 10px rgba(26, 58, 92, 0.2);
+    }
+
+    .logo-container svg {
+      width: 28px;
+      height: 28px;
+      fill: currentColor;
+    }
+
+    .brand-title h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary);
+      letter-spacing: -0.5px;
+    }
+
+    .brand-title p {
+      font-size: 0.85rem;
+      color: var(--primary-light);
+      font-weight: 500;
+    }
+
+    /* BARRA DE ESTADO GLOBAL */
+    .status-bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 24px;
+      border-radius: 30px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      transition: var(--transition);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    }
+
+    .status-bar.integra {
+      background-color: rgba(46, 204, 113, 0.15);
+      color: #27ae60;
+      border: 1px solid rgba(46, 204, 113, 0.3);
+      animation: pulse-green 2s infinite;
+    }
+
+    .status-bar.comprometida {
+      background-color: rgba(231, 76, 60, 0.15);
+      color: #c0392b;
+      border: 1px solid rgba(231, 76, 60, 0.3);
+      animation: pulse-red 1.5s infinite;
+    }
+
+    .status-icon {
+      font-size: 1.2rem;
+    }
+
+    /* GRID CONTENEDOR */
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1fr 350px;
+      gap: 20px;
+      flex-grow: 1;
+      align-items: start;
+    }
+
+    .left-column {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* SECCIÓN 1: IDENTIDADES DEL PERSONAL */
+    .identities-section {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .identity-card {
+      background: var(--white);
+      padding: 20px;
+      border-radius: var(--border-radius);
+      box-shadow: 0 4px 12px rgba(26, 58, 92, 0.03);
+      border: 1px solid rgba(26, 58, 92, 0.05);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      position: relative;
+      transition: var(--transition);
+    }
+
+    .identity-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(26, 58, 92, 0.08);
+      border-color: rgba(26, 58, 92, 0.15);
+    }
+
+    .identity-avatar {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: rgba(26, 58, 92, 0.05);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--primary);
+    }
+
+    .identity-avatar svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    .identity-info {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .identity-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .identity-name {
+      font-weight: 700;
+      color: var(--primary);
+      font-size: 0.95rem;
+    }
+
+    .role-badge {
+      font-size: 0.7rem;
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .role-recepcion {
+      background: rgba(52, 152, 219, 0.15);
+      color: #2980b9;
+      border: 1px solid rgba(52, 152, 219, 0.3);
+    }
+
+    .role-medico {
+      background: rgba(46, 204, 113, 0.15);
+      color: #27ae60;
+      border: 1px solid rgba(46, 204, 113, 0.3);
+    }
+
+    .pubkey-container {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      background: var(--gray-bg);
+      padding: 3px 8px;
+      border-radius: 6px;
+      color: var(--primary-light);
+      cursor: help;
+      display: inline-block;
+      width: max-content;
+      border: 1px solid rgba(26, 58, 92, 0.05);
+      position: relative;
+    }
+
+    .key-status {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--success);
+    }
+
+    .led-dot {
+      width: 8px;
+      height: 8px;
+      background-color: var(--success);
+      border-radius: 50%;
+      display: inline-block;
+      box-shadow: 0 0 8px var(--success);
+      animation: pulse-led 2s infinite;
+    }
+
+    /* TOOLTIPS PERSONALIZADOS */
+    [data-tooltip] {
+      position: relative;
+    }
+
+    [data-tooltip]::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      bottom: 125%;
+      left: 50%;
+      transform: translateX(-50%) scale(0.95);
+      background: var(--primary);
+      color: var(--white);
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 0.75rem;
+      font-family: var(--font-ui);
+      font-weight: 400;
+      width: 220px;
+      text-align: center;
+      visibility: hidden;
+      opacity: 0;
+      transition: var(--transition);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+      z-index: 100;
+      pointer-events: none;
+      line-height: 1.3;
+    }
+
+    [data-tooltip]::before {
+      content: '';
+      position: absolute;
+      bottom: 115%;
+      left: 50%;
+      transform: translateX(-50%);
+      border-width: 5px;
+      border-style: solid;
+      border-color: var(--primary) transparent transparent transparent;
+      visibility: hidden;
+      opacity: 0;
+      transition: var(--transition);
+      z-index: 100;
+      pointer-events: none;
+    }
+
+    [data-tooltip]:hover::after,
+    [data-tooltip]:hover::before {
+      visibility: visible;
+      opacity: 1;
+      transform: translateX(-50%) scale(1);
+    }
+
+    /* SECCIÓN 2: LOG DE EVENTOS / AGENDA */
+    .log-section {
+      background: var(--white);
+      border-radius: var(--border-radius);
+      box-shadow: 0 4px 20px rgba(26, 58, 92, 0.04);
+      border: 1px solid rgba(26, 58, 92, 0.05);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .section-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--gray-light);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--white);
+    }
+
+    .section-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .section-title svg {
+      width: 20px;
+      height: 20px;
+      color: var(--primary);
+    }
+
+    .log-table-container {
+      max-height: 520px;
+      overflow-y: auto;
+      position: relative;
+    }
+
+    .log-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    .log-table th {
+      background: var(--gray-bg);
+      color: var(--primary-light);
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 12px 20px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      border-bottom: 1px solid var(--gray-light);
+    }
+
+    .event-row {
+      border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+      cursor: pointer;
+      transition: var(--transition);
+      background: var(--white);
+    }
+
+    .event-row:hover {
+      background: rgba(26, 58, 92, 0.02);
+    }
+
+    .event-row.expanded {
+      background: rgba(26, 58, 92, 0.03) !important;
+    }
+
+    .event-row.compromised {
+      background: rgba(231, 76, 60, 0.05) !important;
+      border-left: 4px solid var(--danger);
+      animation: shake 0.5s ease-in-out 1;
+    }
+
+    .event-row.compromised:hover {
+      background: rgba(231, 76, 60, 0.08) !important;
+    }
+
+    .event-cell {
+      padding: 16px 20px;
+      font-size: 0.88rem;
+      vertical-align: middle;
+    }
+
+    .event-id {
+      font-weight: 700;
+      color: var(--primary-light);
+    }
+
+    .event-time {
+      color: #64748b;
+      white-space: nowrap;
+    }
+
+    /* BADGES DE ACCIONES */
+    .action-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-align: center;
+      width: 90px;
+    }
+
+    .action-crear {
+      background: rgba(46, 204, 113, 0.15);
+      color: #27ae60;
+      border: 1px solid rgba(46, 204, 113, 0.2);
+    }
+
+    .action-modificar {
+      background: rgba(243, 156, 18, 0.15);
+      color: #d35400;
+      border: 1px solid rgba(243, 156, 18, 0.2);
+    }
+
+    .action-cancelar {
+      background: rgba(231, 76, 60, 0.15);
+      color: #c0392b;
+      border: 1px solid rgba(231, 76, 60, 0.2);
+    }
+
+    .event-cita {
+      font-weight: 500;
+      color: var(--primary);
+    }
+
+    /* BADGE VERIFICACIÓN */
+    .verify-status {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 700;
+      font-size: 0.78rem;
+    }
+
+    .verify-status.verified {
+      color: var(--success);
+    }
+
+    .verify-status.compromised {
+      color: var(--danger);
+      animation: pulse-text-danger 1.5s infinite;
+    }
+
+    .verify-status svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    /* PANEL ACORDEÓN EXPANDIBLE */
+    .accordion-row {
+      background: var(--gray-bg);
+      border-bottom: 1px solid rgba(26, 58, 92, 0.05);
+      display: none;
+    }
+
+    .accordion-row.open {
+      display: table-row;
+    }
+
+    .accordion-content {
+      padding: 20px 24px;
+      background: var(--gray-bg);
+    }
+
+    /* PESTAÑAS (TABS) */
+    .tab-header {
+      display: flex;
+      gap: 8px;
+      border-bottom: 1px solid var(--gray-light);
+      margin-bottom: 16px;
+    }
+
+    .tab-btn {
+      background: none;
+      border: none;
+      padding: 8px 16px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #64748b;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: var(--transition);
+    }
+
+    .tab-btn:hover {
+      color: var(--primary);
+    }
+
+    .tab-btn.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+
+    .tab-panel {
+      display: none;
+    }
+
+    .tab-panel.active {
+      display: block;
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
+    /* CONTENIDOS TABS */
+    .non-technical-desc {
+      font-size: 0.92rem;
+      color: var(--gray-dark);
+      background: var(--white);
+      padding: 16px;
+      border-radius: 8px;
+      border-left: 4px solid var(--primary);
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.01);
+    }
+
+    .crypto-details-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .crypto-field {
+      background: var(--white);
+      padding: 12px 16px;
+      border-radius: 8px;
+      border: 1px solid rgba(26, 58, 92, 0.05);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .crypto-field-title {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--primary-light);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .crypto-field-val {
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      color: var(--gray-dark);
+      word-break: break-all;
+      background: var(--gray-bg);
+      padding: 6px 10px;
+      border-radius: 4px;
+      border: 1px dashed var(--gray-light);
+    }
+
+    .crypto-field-val.red-text {
+      color: var(--danger);
+      background: rgba(231, 76, 60, 0.05);
+      border-color: rgba(231, 76, 60, 0.2);
+    }
+
+    /* ==========================================================================
+       SIDEBAR / PANEL DE SIMULACIÓN DE ATAQUES
+       ========================================================================== */
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .panel-card {
+      background: var(--white);
+      border-radius: var(--border-radius);
+      box-shadow: 0 4px 20px rgba(26, 58, 92, 0.04);
+      border: 1px solid rgba(26, 58, 92, 0.05);
+      padding: 24px;
+    }
+
+    .panel-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 1px solid var(--gray-bg);
+      padding-bottom: 12px;
+    }
+
+    .panel-title svg {
+      width: 20px;
+      height: 20px;
+      color: var(--danger);
+    }
+
+    .attack-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.88rem;
+      border: 1px solid;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 12px;
+      transition: var(--transition);
+      text-align: left;
+    }
+
+    .btn svg {
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+    }
+
+    .btn-attack {
+      background: var(--white);
+      border-color: rgba(231, 76, 60, 0.2);
+      color: var(--danger);
+    }
+
+    .btn-attack:hover {
+      background: var(--danger);
+      color: var(--white);
+      border-color: var(--danger);
+      box-shadow: 0 4px 12px rgba(231, 76, 60, 0.25);
+      transform: translateY(-1px);
+    }
+
+    .btn-attack.active {
+      background: #c0392b;
+      color: var(--white);
+      border-color: #c0392b;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .btn-restore {
+      background: var(--success);
+      border-color: var(--success);
+      color: var(--white);
+      justify-content: center;
+      box-shadow: 0 4px 10px rgba(46, 204, 113, 0.2);
+    }
+
+    .btn-restore:hover {
+      background: #27ae60;
+      border-color: #27ae60;
+      box-shadow: 0 6px 15px rgba(46, 204, 113, 0.3);
+      transform: translateY(-1px);
+    }
+
+    /* PANEL DE RESULTADO/ALERTA DE ATAQUES */
+    .attack-message-box {
+      background: var(--gray-bg);
+      border: 1px solid var(--gray-light);
+      border-radius: 8px;
+      padding: 16px;
+      font-size: 0.88rem;
+      color: var(--gray-dark);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      transition: var(--transition);
+    }
+
+    .attack-message-box.active-error {
+      background: rgba(231, 76, 60, 0.08);
+      border-color: rgba(231, 76, 60, 0.3);
+      color: #c0392b;
+      animation: pulse-bg-danger 2s infinite;
+    }
+
+    .msg-title {
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .msg-body {
+      font-weight: 500;
+      line-height: 1.4;
+    }
+
+    /* ==========================================================================
+       DIAGRAMA DE CADENA (BLOCKCHAIN HORIZONTAL)
+       ========================================================================== */
+    .diagram-section {
+      background: var(--white);
+      border-radius: var(--border-radius);
+      box-shadow: 0 4px 20px rgba(26, 58, 92, 0.04);
+      border: 1px solid rgba(26, 58, 92, 0.05);
+      padding: 24px;
+      margin-top: 20px;
+    }
+
+    .diagram-container {
+      width: 100%;
+      overflow-x: auto;
+      padding: 10px 0;
+    }
+
+    .chain-svg {
+      display: block;
+      margin: 0 auto;
+      max-width: 100%;
+      height: auto;
+    }
+
+    .diagram-legend {
+      text-align: center;
+      margin-top: 16px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--primary-light);
+      background: var(--primary-bg);
+      padding: 10px;
+      border-radius: 8px;
+      display: inline-block;
+      width: 100%;
+      border: 1px dashed var(--gray-light);
+    }
+
+    /* CLASES DINÁMICAS SVG */
+    .svg-block-bg {
+      fill: var(--white);
+      stroke: var(--primary);
+      stroke-width: 2;
+      transition: var(--transition);
+    }
+
+    .svg-block-header {
+      fill: var(--primary);
+      transition: var(--transition);
+    }
+
+    .svg-block-header-text {
+      fill: var(--white);
+      font-family: var(--font-ui);
+      font-weight: 700;
+      font-size: 11px;
+    }
+
+    .svg-block-text {
+      fill: var(--gray-dark);
+      font-family: var(--font-ui);
+      font-size: 10px;
+    }
+
+    .svg-block-hash {
+      fill: var(--primary-light);
+      font-family: var(--font-mono);
+      font-size: 9px;
+      font-weight: 500;
+    }
+
+    .svg-arrow-line {
+      stroke: var(--primary);
+      stroke-width: 2;
+      stroke-dasharray: 4 2;
+      fill: none;
+      transition: var(--transition);
+      animation: dash 15s linear infinite;
+    }
+
+    .svg-arrow-head {
+      fill: var(--primary);
+      transition: var(--transition);
+    }
+
+    /* ESTADO COMPROMETIDO EN SVG */
+    .compromised-block .svg-block-bg {
+      stroke: var(--danger);
+      fill: rgba(231, 76, 60, 0.05);
+      animation: pulse-svg-border 1.5s infinite;
+    }
+
+    .compromised-block .svg-block-header {
+      fill: var(--danger);
+    }
+
+    .compromised-arrow .svg-arrow-line {
+      stroke: var(--danger);
+      stroke-dasharray: none;
+    }
+
+    .compromised-arrow .svg-arrow-head {
+      fill: var(--danger);
+    }
+
+    /* ==========================================================================
+       KEYFRAMES ANIMACIONES
+       ========================================================================== */
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+      20%, 40%, 60%, 80% { transform: translateX(5px); }
+    }
+
+    @keyframes pulse-green {
+      0% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.4); }
+      70% { box-shadow: 0 0 0 10px rgba(46, 204, 113, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0); }
+    }
+
+    @keyframes pulse-red {
+      0% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.4); }
+      70% { box-shadow: 0 0 0 10px rgba(231, 76, 60, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0); }
+    }
+
+    @keyframes pulse-led {
+      0% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.7); }
+      70% { box-shadow: 0 0 0 6px rgba(46, 204, 113, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0); }
+    }
+
+    @keyframes pulse-svg-border {
+      0% { stroke-width: 2; }
+      50% { stroke-width: 3.5; filter: drop-shadow(0 0 4px rgba(231, 76, 60, 0.5)); }
+      100% { stroke-width: 2; }
+    }
+
+    @keyframes pulse-bg-danger {
+      0% { background-color: rgba(231, 76, 60, 0.08); }
+      50% { background-color: rgba(231, 76, 60, 0.15); }
+      100% { background-color: rgba(231, 76, 60, 0.08); }
+    }
+
+    @keyframes pulse-text-danger {
+      0% { opacity: 1; }
+      50% { opacity: 0.6; }
+      100% { opacity: 1; }
+    }
+
+    @keyframes dash {
+      to {
+        stroke-dashoffset: -40;
+      }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* VISTA DE PANTALLA COMPLETA NARRATIVA */
+    .narrative-guide {
+      margin-bottom: 20px;
+      background: var(--primary);
+      color: var(--white);
+      padding: 12px 20px;
+      border-radius: var(--border-radius);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-size: 0.85rem;
+      box-shadow: 0 4px 15px rgba(26, 58, 92, 0.15);
+    }
+
+    .guide-step {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      opacity: 0.75;
+      font-weight: 500;
+    }
+
+    .guide-step.active {
+      opacity: 1;
+      font-weight: 700;
+      background: rgba(255, 255, 255, 0.15);
+      padding: 4px 10px;
+      border-radius: 20px;
+    }
+
+    .guide-badge {
+      background: var(--success);
+      color: var(--white);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.7rem;
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- BARRA GUÍA NARRATIVA PARA GRABACIÓN DE VIDEO -->
+  <div class="narrative-guide">
+    <span class="guide-badge">Flujo Demo</span>
+    <div class="guide-step active" id="step1">1. Personal</div>
+    <div class="guide-step" id="step2">2. Recorrer Log</div>
+    <div class="guide-step" id="step3">3. Lanzar Ataque</div>
+    <div class="guide-step" id="step4">4. Detección</div>
+    <div class="guide-step" id="step5">5. Ver Diagrama</div>
+    <div class="guide-step" id="step6">6. Restaurar</div>
+  </div>
+
+  <!-- CABECERA -->
+  <header>
+    <div class="brand">
+      <div class="logo-container">
+        <!-- Icono Cruz Médica Digital -->
+        <svg viewBox="0 0 24 24">
+          <path d="M19 10.5h-5.5V5c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v5.5H5c-.83 0-1.5.67-1.5 1.5s.67 1.5 1.5 1.5h5.5V19c0 .83.67 1.5 1.5 1.5s1.5-.67 1.5-1.5v-5.5H19c.83 0 1.5-.67 1.5-1.5s-.67-1.5-1.5-1.5z"/>
+          <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="3 3"/>
+        </svg>
+      </div>
+      <div class="brand-title">
+        <h1>CRIQ — Agenda Criptográfica Segura</h1>
+        <p>Centro de Rehabilitación Integral de Querétaro | Demo Académica de Seguridad</p>
+      </div>
+    </div>
+    
+    <!-- Barra de Estado Global -->
+    <div id="globalStatus" class="status-bar integra">
+      <span class="status-icon" id="globalStatusIcon">✓</span>
+      <span id="globalStatusText">Cadena íntegra — 15/15 eventos verificados</span>
+    </div>
+  </header>
+
+  <!-- CONTENEDOR PRINCIPAL -->
+  <main class="main-grid">
+    
+    <!-- COLUMNA IZQUIERDA (IDENTIDADES Y LOG) -->
+    <div class="left-column">
+      
+      <!-- SECCIÓN 1: IDENTIDADES DEL PERSONAL -->
+      <section class="identities-section" id="personalIdentities">
+        <!-- Recepción 1 -->
+        <div class="identity-card">
+          <div class="identity-avatar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+              <circle cx="9" cy="7" r="4"/>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+            </svg>
+          </div>
+          <div class="identity-info">
+            <div class="identity-header">
+              <span class="identity-name">RECEPCION1</span>
+              <span class="role-badge role-recepcion">Recepción</span>
+            </div>
+            <div class="pubkey-container" data-tooltip="Identidad digital verificable (Clave Pública) — permite confirmar quién firmó sin revelar su secreto.">
+              PUB:3a7f...c92d
+            </div>
+            <div class="key-status"><span class="led-dot"></span>Llave activa</div>
+          </div>
+        </div>
+
+        <!-- Medico 1 -->
+        <div class="identity-card">
+          <div class="identity-avatar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="2" y="7" width="20" height="14" rx="2" ry="2"/>
+              <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+            </svg>
+          </div>
+          <div class="identity-info">
+            <div class="identity-header">
+              <span class="identity-name">MEDICO1</span>
+              <span class="role-badge role-medico">Médico</span>
+            </div>
+            <div class="pubkey-container" data-tooltip="Identidad digital verificable (Clave Pública) — permite confirmar quién firmó sin revelar su secreto.">
+              PUB:8b2e...d81a
+            </div>
+            <div class="key-status"><span class="led-dot"></span>Llave activa</div>
+          </div>
+        </div>
+
+        <!-- Medico 2 -->
+        <div class="identity-card">
+          <div class="identity-avatar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="2" y="7" width="20" height="14" rx="2" ry="2"/>
+              <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+            </svg>
+          </div>
+          <div class="identity-info">
+            <div class="identity-header">
+              <span class="identity-name">MEDICO2</span>
+              <span class="role-badge role-medico">Médico</span>
+            </div>
+            <div class="pubkey-container" data-tooltip="Identidad digital verificable (Clave Pública) — permite confirmar quién firmó sin revelar su secreto.">
+              PUB:5c9d...a24f
+            </div>
+            <div class="key-status"><span class="led-dot"></span>Llave activa</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECCIÓN 2: LOG DE EVENTOS / AGENDA -->
+      <section class="log-section">
+        <div class="section-header">
+          <div class="section-title">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2M9 5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2m-6 9l2 2 4-4"/>
+            </svg>
+            Bitácora de Citas Médicas Criptográfica (Log de Eventos)
+          </div>
+        </div>
+        <div class="log-table-container">
+          <table class="log-table">
+            <thead>
+              <tr>
+                <th style="width: 70px;">ID</th>
+                <th style="width: 170px;">Fecha / Hora</th>
+                <th style="width: 120px;">Acción</th>
+                <th style="width: 140px;">Firmante</th>
+                <th>Datos de la Cita</th>
+                <th style="width: 140px; text-align: center;">Integridad</th>
+              </tr>
+            </thead>
+            <tbody id="logTableBody">
+              <!-- Eventos dinámicos aquí -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- COLUMNA DERECHA (SIMULADOR DE ATAQUES) -->
+    <div class="sidebar">
+      
+      <section class="panel-card">
+        <div class="panel-title">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+          </svg>
+          Simulador de Ataques
+        </div>
+        
+        <div class="attack-buttons">
+          <button class="btn btn-attack" id="btnAlterar" onclick="simularAtaque('alterar')">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+            </svg>
+            Alterar Datos (Evento 6)
+          </button>
+          
+          <button class="btn btn-attack" id="btnSuplantar" onclick="simularAtaque('suplantar')">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M16 7a4 4 0 11-8 0 4 4 0 0 1 8 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+            </svg>
+            Suplantación (Evento 16)
+          </button>
+          
+          <button class="btn btn-attack" id="btnEliminar" onclick="simularAtaque('eliminar')">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+            </svg>
+            Eliminar Evento (Quita #7)
+          </button>
+          
+          <button class="btn btn-attack" id="btnReordenar" onclick="simularAtaque('reordenar')">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/>
+            </svg>
+            Reordenar Eventos (1 y 2)
+          </button>
+          
+          <button class="btn btn-restore" id="btnRestaurar" onclick="restaurarTodo()">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 8H18.2"/>
+            </svg>
+            Restaurar Log Original
+          </button>
+        </div>
+
+        <div class="attack-message-box" id="attackMessageBox">
+          <div class="msg-title" id="msgTitle">
+            🔬 Estado del Monitoreo
+          </div>
+          <div class="msg-body" id="msgBody">
+            Sistema operativo sin anomalías. Todos los bloques se validan correctamente contra el registro centralizado del CRIQ.
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- SECCIÓN 4: DIAGRAMA DE CADENA -->
+  <section class="diagram-section">
+    <div class="section-title">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+      </svg>
+      Topología del Encadenamiento Criptográfico (Blockchain Simplificado)
+    </div>
+    
+    <div class="diagram-container">
+      <!-- SVG del diagrama dinámico -->
+      <svg class="chain-svg" id="chainSvg" viewBox="0 0 960 160" width="960" height="160">
+        <!-- Las flechas y bloques se renderizan y colorean con JS dinámicamente -->
+      </svg>
+    </div>
+    
+    <div class="diagram-legend" data-tooltip="Cadena de hashes: Eslabones criptográficos — cada registro contiene la huella (hash anterior) del anterior, formando una cadena inviolable.">
+      🔗 <strong>Leyenda Criptográfica:</strong> Como eslabones de una cadena: si alguien rompe uno, todos los siguientes lo delatan inmediatamente al recalcular los hashes.
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       LÓGICA JAVASCRIPT & CRIPTOGRAFÍA
+       ========================================================================== */ -->
+  <script>
+    // 1. EVENTOS HARDCODEADOS ORIGINALES (Proporcionados por el usuario)
+    const ORIGINAL_LOG = [
+      { idEvento: 1,  timestamp: 1781054641, tipoAccion: "CANCELAR",  idUsuario: "RECEPCION1", rolUsuario: "RECEPCION", datosCita: "PACIENTE342: CONSULTA GENERAL", hashAnterior: "0x" + "0".repeat(64), hashEvento: "0xbb9ca5f7385375c7296f3886e2379c4f046246f20e3f4a02b7756f959f0e74fb" },
+      { idEvento: 2,  timestamp: 1781054641, tipoAccion: "CANCELAR",  idUsuario: "RECEPCION1", rolUsuario: "RECEPCION", datosCita: "PACIENTE178: CONSULTA GENERAL", hashAnterior: "0xbb9ca5f7385375c7296f3886e2379c4f046246f20e3f4a02b7756f959f0e74fb", hashEvento: "0xc3f018bfc74ef66fd3cc8f1967c0711455b06d865249061c8b9befc1f7a1ffc5" },
+      { idEvento: 3,  timestamp: 1781054642, tipoAccion: "CANCELAR",  idUsuario: "MEDICO1",    rolUsuario: "MEDICO",    datosCita: "PACIENTE521: CONSULTA GENERAL", hashAnterior: "0xc3f018bfc74ef66fd3cc8f1967c0711455b06d865249061c8b9befc1f7a1ffc5", hashEvento: "0x8761fd283814b00c504f00aa4979f3c554920e9a0939494bb401059850355b4e" },
+      { idEvento: 4,  timestamp: 1781054643, tipoAccion: "MODIFICAR", idUsuario: "MEDICO1",    rolUsuario: "MEDICO",    datosCita: "PACIENTE089: CONSULTA GENERAL", hashAnterior: "0x8761fd283814b00c504f00aa4979f3c554920e9a0939494bb401059850355b4e", hashEvento: "0xb41bb9a774fda9a52975c856be0450376b351d8ade59f9394a7ac0972278feb3" },
+      { idEvento: 5,  timestamp: 1781054643, tipoAccion: "CREAR",     idUsuario: "RECEPCION1", rolUsuario: "RECEPCION", datosCita: "PACIENTE763: CONSULTA GENERAL", hashAnterior: "0xb41bb9a774fda9a52975c856be0450376b351d8ade59f9394a7ac0972278feb3", hashEvento: "0x7af9d46aada7e591dc4c6e644a9e45e3c7c1d3c13bc026b2050391785f42bd37" },
+      { idEvento: 6,  timestamp: 1781054644, tipoAccion: "MODIFICAR", idUsuario: "RECEPCION1", rolUsuario: "RECEPCION", datosCita: "PACIENTE415: CONSULTA GENERAL", hashAnterior: "0x7af9d46aada7e591dc4c6e644a9e45e3c7c1d3c13bc026b2050391785f42bd37", hashEvento: "0x9618f1bd89cf2fc1015178033110fc3ce405fd76ae6b175510523a68e4a1fe0a" },
+      { idEvento: 7,  timestamp: 1781054645, tipoAccion: "CREAR",     idUsuario: "RECEPCION1", rolUsuario: "RECEPCION", datosCita: "PACIENTE237: CONSULTA GENERAL", hashAnterior: "0x9618f1bd89cf2fc1015178033110fc3ce405fd76ae6b175510523a68e4a1fe0a", hashEvento: "0x7bebd808b2e6b89b6c300b4baad2f0b029685e6a9c35c0c4420e43f64c8ef5c3" },
+      { idEvento: 8,  timestamp: 1781054646, tipoAccion: "CREAR",     idUsuario: "MEDICO2",    rolUsuario: "MEDICO",    datosCita: "PACIENTE694: CONSULTA GENERAL", hashAnterior: "0x7bebd808b2e6b89b6c300b4baad2f0b029685e6a9c35c0c4420e43f64c8ef5c3", hashEvento: "0xc6ac7dad943b811ea95dcfd75685e7d59221cc00edf895874830fd7435207c96" },
+      { idEvento: 9,  timestamp: 1781054646, tipoAccion: "CANCELAR",  idUsuario: "RECEPCION1", rolUsuario: "RECEPCION", datosCita: "PACIENTE112: CONSULTA GENERAL", hashAnterior: "0xc6ac7dad943b811ea95dcfd75685e7d59221cc00edf895874830fd7435207c96", hashEvento: "0x86d7def25f2c63fbcca32195450fc93aedfe8e4c46039647c18955763880e9e4" },
+      { idEvento: 10, timestamp: 1781054647, tipoAccion: "CANCELAR",  idUsuario: "RECEPCION1", rolUsuario: "RECEPCION", datosCita: "PACIENTE856: CONSULTA GENERAL", hashAnterior: "0x86d7def25f2c63fbcca32195450fc93aedfe8e4c46039647c18955763880e9e4", hashEvento: "0xde5cec2c86eea20508a0d87302b3875493ea2fe151fb3fea28a2d5fc54f55c9" },
+      { idEvento: 11, timestamp: 1781054648, tipoAccion: "MODIFICAR", idUsuario: "RECEPCION1", rolUsuario: "RECEPCION", datosCita: "PACIENTE033: CONSULTA GENERAL", hashAnterior: "0xde5cec2c86eea20508a0d87302b3875493ea2fe151fb3fea28a2d5fc54f55c9", hashEvento: "0xb051ecd105bde080fa951cd9b7d0994091aa351a3733082495c38116c080c8c1" },
+      { idEvento: 12, timestamp: 1781054648, tipoAccion: "CREAR",     idUsuario: "MEDICO2",    rolUsuario: "MEDICO",    datosCita: "PACIENTE447: CONSULTA GENERAL", hashAnterior: "0xb051ecd105bde080fa951cd9b7d0994091aa351a3733082495c38116c080c8c1", hashEvento: "0x15992cd1f94641afc41fc49d95f5a78bedb9d16acf97b136f05b549c1a521f80" },
+      { idEvento: 13, timestamp: 1781054649, tipoAccion: "CANCELAR",  idUsuario: "MEDICO2",    rolUsuario: "MEDICO",    datosCita: "PACIENTE291: CONSULTA GENERAL", hashAnterior: "0x15992cd1f94641afc41fc49d95f5a78bedb9d16acf97b136f05b549c1a521f80", hashEvento: "0xe8db9590d30f69903c3c53e5fee90f143c6fb24ca29fe7950756715c2cd5f0a7" },
+      { idEvento: 14, timestamp: 1781054650, tipoAccion: "MODIFICAR", idUsuario: "RECEPCION1", rolUsuario: "RECEPCION", datosCita: "PACIENTE568: CONSULTA GENERAL", hashAnterior: "0xe8db9590d30f69903c3c53e5fee90f143c6fb24ca29fe7950756715c2cd5f0a7", hashEvento: "0x8f8126ad749bad47e574033285a76973e63a1a114d98c4f52506b6e0889542ac" },
+      { idEvento: 15, timestamp: 1781054651, tipoAccion: "CREAR",     idUsuario: "MEDICO1",    rolUsuario: "MEDICO",    datosCita: "PACIENTE724: CONSULTA GENERAL", hashAnterior: "0x8f8126ad749bad47e574033285a76973e63a1a114d98c4f52506b6e0889542ac", hashEvento: "0x816492c031ad974ec5b785fd7160158e0b4633f231ecefee0f23a3935ab2596d" }
+    ];
+
+    // Claves Públicas Ficticias asociadas a los tooltips
+    const PUBLIC_KEYS = {
+      "RECEPCION1": "PUB:3a7f6c9b2d8e5f6a1c3b0d7e6f8a9c0b1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a",
+      "MEDICO1": "PUB:8b2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a1c3b0d7e6f8a9c0b1d2e3f4a5b6c7d8e",
+      "MEDICO2": "PUB:5c9d8e7f6a5b4c3d2e1f0a9b8c7d6e5f4a3b2c1d0e9f8a7b6c5d4e3f2a1b0c9d"
+    };
+
+    // Firmas Criptográficas (r, s) simuladas deterministas (fines ilustrativos)
+    const SIMULATED_SIGNATURES = ORIGINAL_LOG.map(e => {
+      // Genera un par r,s determinista para la demo visual
+      const seed = e.idEvento * 997;
+      const rVal = "0x" + String(seed + 104729).repeat(8).substring(0, 64);
+      const sVal = "0x" + String(seed * seed + 7919).repeat(8).substring(0, 64);
+      return { r: rVal, s: sVal };
+    });
+
+    // Copia de los eventos en memoria activa para las manipulaciones del simulador
+    let logEventos = [];
+    let ataqueActivo = null; // 'alterar', 'suplantar', 'eliminar', 'reordenar'
+
+    // 2. FUNCIÓN DE CRYPTO PARA CALCULAR EL HASH DE FORMA REAL (Web Crypto API)
+    async function calcularSHA256(evento) {
+      // Formato exacto de cadena que Python serializa
+      const stringEvento = `${evento.idEvento}|${evento.timestamp}|${evento.tipoAccion}|${evento.idUsuario}|${evento.rolUsuario}|${evento.datosCita}|${evento.hashAnterior}`;
+      const encoder = new TextEncoder();
+      const data = encoder.encode(stringEvento);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      const hashHex = '0x' + hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+      return hashHex;
+    }
+
+    // Inicializa o recalcula las relaciones de hashes de la cadena en memoria de forma real
+    async function inicializarCadena(usarHashesReales = true) {
+      logEventos = JSON.parse(JSON.stringify(ORIGINAL_LOG));
+      
+      if (usarHashesReales) {
+        let prevHash = "0x" + "0".repeat(64);
+        for (let i = 0; i < logEventos.length; i++) {
+          logEventos[i].hashAnterior = prevHash;
+          const hashReal = await calcularSHA256(logEventos[i]);
+          logEventos[i].hashEvento = hashReal;
+          prevHash = hashReal;
+        }
+      }
+    }
+
+    // 3. RENDERIZACIÓN DE LA AGENDA / TABLA
+    function renderLog() {
+      const tableBody = document.getElementById("logTableBody");
+      tableBody.innerHTML = "";
+
+      logEventos.forEach((evento, index) => {
+        // Formateo legible de fecha
+        const dateStr = new Date(evento.timestamp * 1000).toLocaleString('es-MX', {
+          day: '2-digit', month: 'short', year: 'numeric',
+          hour: '2-digit', minute: '2-digit', second: '2-digit'
+        });
+
+        // Verificaciones
+        const esValido = evento.esValido !== false;
+        
+        // Fila Principal
+        const row = document.createElement("tr");
+        row.className = `event-row ${!esValido ? 'compromised' : ''}`;
+        row.id = `event-row-${evento.idEvento}`;
+        row.onclick = () => toggleAccordion(evento.idEvento);
+
+        // Badge de Acción
+        const actClass = `action-${evento.tipoAccion.toLowerCase()}`;
+        
+        // Badge de Firmante
+        const rolClass = `role-${evento.rolUsuario.toLowerCase()}`;
+        const rolText = evento.rolUsuario === 'MEDICO' ? 'Médico' : 'Recepción';
+
+        // Badge de Integridad
+        const statusBadge = esValido 
+          ? `<span class="verify-status verified">
+               <svg fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M2.166 4.9H2v.5h.166A8.001 8.001 0 0110 18a8.001 8.001 0 017.834-6.6H18v-.5h-.166A8.001 8.001 0 0110 2 8.001 8.001 0 012.166 4.9zM10 4a6 6 0 100 12 6 6 0 000-12zm-1 3a1 1 0 012 0v4a1 1 0 11-2 0V7zm1 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"/></svg>
+               VERIFICADO
+             </span>`
+          : `<span class="verify-status compromised">
+               <svg fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
+               ${evento.mensajeFalla || 'CORROMPIDO'}
+             </span>`;
+
+        row.innerHTML = `
+          <td class="event-cell event-id">#${evento.idEvento}</td>
+          <td class="event-cell event-time">${dateStr}</td>
+          <td class="event-cell"><span class="action-badge ${actClass}">${evento.tipoAccion}</span></td>
+          <td class="event-cell">
+            <span class="event-cita" style="font-weight:700;">${evento.idUsuario}</span>
+            <span class="role-badge ${rolClass}" style="margin-left: 4px;">${rolText}</span>
+          </td>
+          <td class="event-cell event-cita">${evento.datosCita}</td>
+          <td class="event-cell" style="text-align: center;">${statusBadge}</td>
+        `;
+
+        tableBody.appendChild(row);
+
+        // Fila Acordeón Oculta
+        const accRow = document.createElement("tr");
+        accRow.className = "accordion-row";
+        accRow.id = `accordion-row-${evento.idEvento}`;
+        
+        // Construimos textos informativos basados en el contexto
+        const simpleDesc = getExplicacionSencilla(evento);
+        const sig = SIMULATED_SIGNATURES[evento.idEvento - 1] || { r: '0x...', s: '0x...' };
+        
+        accRow.innerHTML = `
+          <td colspan="6">
+            <div class="accordion-content">
+              <div class="tab-header">
+                <button class="tab-btn active" id="tab-simple-btn-${evento.idEvento}" onclick="switchTab(${evento.idEvento}, 'simple')">Explicación Clínica</button>
+                <button class="tab-btn" id="tab-tech-btn-${evento.idEvento}" onclick="switchTab(${evento.idEvento}, 'tech')">Estructura Criptográfica (ECDSA & SHA256)</button>
+              </div>
+              
+              <!-- TAB PARA TODOS -->
+              <div class="tab-panel active" id="tab-simple-panel-${evento.idEvento}">
+                <div class="non-technical-desc">
+                  <strong>Resumen del Evento:</strong> ${simpleDesc}
+                </div>
+              </div>
+              
+              <!-- TAB TÉCNICO -->
+              <div class="tab-panel" id="tab-tech-panel-${evento.idEvento}">
+                <div class="crypto-details-grid">
+                  
+                  <div class="crypto-field">
+                    <span class="crypto-field-title" data-tooltip="Cadena de hashes: Cada registro contiene la huella (hash anterior) del anterior, formando una cadena inviolable.">
+                      Hash Anterior (hashAnterior)
+                      <span class="guide-badge" style="background:#475569;">Cadena</span>
+                    </span>
+                    <span class="crypto-field-val ${!esValido && index > 0 && logEventos[index-1].esValido === false ? 'red-text' : ''}">${evento.hashAnterior}</span>
+                  </div>
+
+                  <div class="crypto-field">
+                    <span class="crypto-field-title" data-tooltip="Hash SHA-256: Huella digital del registro — cualquier cambio, por mínimo que sea, la altera completamente.">
+                      Hash de este Evento (hashEvento)
+                      <span class="guide-badge" style="background:#475569;">SHA-256</span>
+                    </span>
+                    <span class="crypto-field-val ${!esValido && (ataqueActivo === 'alterar' && evento.idEvento === 6) ? 'red-text' : ''}">${evento.hashEvento}</span>
+                  </div>
+
+                  <div class="crypto-field">
+                    <span class="crypto-field-title" data-tooltip="Firma digital: Sello verificable único — como una firma manuscrita que es imposible falsificar.">
+                      Firma Digital ECDSA (secp256k1)
+                      <span class="guide-badge" style="background:#475569;">No Repudio</span>
+                    </span>
+                    <div class="crypto-field-val" style="display:flex; flex-direction:column; gap:4px; font-size:0.78rem;">
+                      <div><strong>Parámetro r:</strong> ${sig.r.substring(0,10)}...${sig.r.substring(sig.r.length-10)}</div>
+                      <div><strong>Parámetro s:</strong> ${sig.s.substring(0,10)}...${sig.s.substring(sig.s.length-10)}</div>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+          </td>
+        `;
+        tableBody.appendChild(accRow);
+      });
+
+      // Renderizar el diagrama dinámico
+      renderDiagrama();
+    }
+
+    // Retorna una explicación legible para directivos médicos
+    function getExplicacionSencilla(evento) {
+      const rolText = evento.rolUsuario === 'MEDICO' ? 'El médico' : 'El personal de recepción';
+      const accionMap = {
+        'CREAR': 'creó un nuevo registro de cita',
+        'MODIFICAR': 'modificó los detalles de la consulta',
+        'CANCELAR': 'canceló de forma definitiva la cita'
+      };
+      
+      let extra = '';
+      if (evento.idEvento === 6 && ataqueActivo === 'alterar') {
+        extra = ' <strong style="color:var(--danger);">[ATENCIÓN: Los datos de este evento fueron modificados maliciosamente, lo que ha roto los hashes de seguridad]</strong>';
+      }
+
+      return `${rolText} <strong>${evento.idUsuario}</strong> ${accionMap[evento.tipoAccion] || 'procesó un cambio'} para <strong>${evento.datosCita}</strong>. El sistema de CRIQ autenticó la identidad del firmante y selló digitalmente el registro. El blockchain impide alterarlo sin alertar a la dirección.${extra}`;
+    }
+
+    // Alternar apertura del acordeón
+    function toggleAccordion(id) {
+      const row = document.getElementById(`event-row-${id}`);
+      const accRow = document.getElementById(`accordion-row-${id}`);
+      
+      // Cerrar otros
+      document.querySelectorAll('.accordion-row').forEach(el => {
+        if(el.id !== `accordion-row-${id}`) el.classList.remove('open');
+      });
+      document.querySelectorAll('.event-row').forEach(el => {
+        if(el.id !== `event-row-${id}`) el.classList.remove('expanded');
+      });
+
+      row.classList.toggle('expanded');
+      accRow.classList.toggle('open');
+    }
+
+    // Cambiar de Pestaña dentro del panel expandido
+    function switchTab(id, tabType) {
+      // Evitar que el clic en los botones del tab propague y cierre el acordeón
+      event.stopPropagation();
+      
+      const simpleBtn = document.getElementById(`tab-simple-btn-${id}`);
+      const techBtn = document.getElementById(`tab-tech-btn-${id}`);
+      const simplePanel = document.getElementById(`tab-simple-panel-${id}`);
+      const techPanel = document.getElementById(`tab-tech-panel-${id}`);
+
+      if (tabType === 'simple') {
+        simpleBtn.classList.add('active');
+        techBtn.classList.remove('active');
+        simplePanel.classList.add('active');
+        techPanel.classList.remove('active');
+      } else {
+        simpleBtn.classList.remove('active');
+        techBtn.classList.add('active');
+        simplePanel.classList.remove('active');
+        techPanel.classList.add('active');
+      }
+    }
+
+    // 4. RENDERIZACIÓN DEL DIAGRAMA DE BLOQUES DE CADENA (SVG DINÁMICO)
+    function renderDiagrama() {
+      const svg = document.getElementById("chainSvg");
+      svg.innerHTML = "";
+
+      // Definición del marcador de flecha
+      const defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
+      const markerGreen = document.createElementNS("http://www.w3.org/2000/svg", "marker");
+      markerGreen.setAttribute("id", "arrowhead-green");
+      markerGreen.setAttribute("markerWidth", "10");
+      markerGreen.setAttribute("markerHeight", "7");
+      markerGreen.setAttribute("refX", "9");
+      markerGreen.setAttribute("refY", "3.5");
+      markerGreen.setAttribute("orient", "auto");
+      const polygonGreen = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+      polygonGreen.setAttribute("points", "0 0, 10 3.5, 0 7");
+      polygonGreen.setAttribute("fill", "#1a3a5c");
+      markerGreen.appendChild(polygonGreen);
+      defs.appendChild(markerGreen);
+
+      const markerRed = document.createElementNS("http://www.w3.org/2000/svg", "marker");
+      markerRed.setAttribute("id", "arrowhead-red");
+      markerRed.setAttribute("markerWidth", "10");
+      markerRed.setAttribute("markerHeight", "7");
+      markerRed.setAttribute("refX", "9");
+      markerRed.setAttribute("refY", "3.5");
+      markerRed.setAttribute("orient", "auto");
+      const polygonRed = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+      polygonRed.setAttribute("points", "0 0, 10 3.5, 0 7");
+      polygonRed.setAttribute("fill", "#e74c3c");
+      markerRed.appendChild(polygonRed);
+      defs.appendChild(markerRed);
+      svg.appendChild(defs);
+
+      // Bloques clave elegidos: Eventos 1, 4, 7, 10, 15
+      const bloquesElegidos = [1, 4, 7, 10, 15];
+      const blockWidth = 120;
+      const blockHeight = 85;
+      const startY = 35;
+      
+      const widthCanvas = 960;
+      const gap = (widthCanvas - (bloquesElegidos.length * blockWidth)) / (bloquesElegidos.length + 1);
+
+      bloquesElegidos.forEach((id, idx) => {
+        // Encontrar evento correspondiente en memoria
+        const evento = logEventos.find(e => e.idEvento === id);
+        if (!evento) return;
+
+        const esValido = evento.esValido !== false;
+        const x = gap + idx * (blockWidth + gap);
+        
+        // Contenedor G para el Bloque
+        const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+        g.setAttribute("class", `svg-block-group ${!esValido ? 'compromised-block' : ''}`);
+        g.style.cursor = "pointer";
+        g.onclick = () => {
+          const tableRow = document.getElementById(`event-row-${id}`);
+          if (tableRow) {
+            tableRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            toggleAccordion(id);
+          }
+        };
+
+        // Rectángulo del Bloque
+        const rectBg = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+        rectBg.setAttribute("x", x);
+        rectBg.setAttribute("y", startY);
+        rectBg.setAttribute("width", blockWidth);
+        rectBg.setAttribute("height", blockHeight);
+        rectBg.setAttribute("rx", "8");
+        rectBg.setAttribute("class", "svg-block-bg");
+        g.appendChild(rectBg);
+
+        // Cabecera del Bloque
+        const rectHeader = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+        rectHeader.setAttribute("x", x);
+        rectHeader.setAttribute("y", startY);
+        rectHeader.setAttribute("width", blockWidth);
+        rectHeader.setAttribute("height", "22");
+        rectHeader.setAttribute("rx", "8");
+        rectHeader.setAttribute("class", "svg-block-header");
+        g.appendChild(rectHeader);
+
+        // Textos del Bloque
+        const txtTitle = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        txtTitle.setAttribute("x", x + blockWidth/2);
+        txtTitle.setAttribute("y", startY + 15);
+        txtTitle.setAttribute("text-anchor", "middle");
+        txtTitle.setAttribute("class", "svg-block-header-text");
+        txtTitle.textContent = `BLOQUE #${evento.idEvento}`;
+        g.appendChild(txtTitle);
+
+        const txtUser = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        txtUser.setAttribute("x", x + 10);
+        txtUser.setAttribute("y", startY + 38);
+        txtUser.setAttribute("class", "svg-block-text");
+        txtUser.textContent = `User: ${evento.idUsuario}`;
+        g.appendChild(txtUser);
+
+        const txtAcc = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        txtAcc.setAttribute("x", x + 10);
+        txtAcc.setAttribute("y", startY + 52);
+        txtAcc.setAttribute("class", "svg-block-text");
+        txtAcc.textContent = `Acción: ${evento.tipoAccion}`;
+        g.appendChild(txtAcc);
+
+        const truncHash = evento.hashEvento.substring(0, 10) + "...";
+        const txtHash = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        txtHash.setAttribute("x", x + 10);
+        txtHash.setAttribute("y", startY + 74);
+        txtHash.setAttribute("class", "svg-block-hash");
+        txtHash.textContent = `Hash: ${truncHash}`;
+        g.appendChild(txtHash);
+
+        svg.appendChild(g);
+
+        // Dibujar Flecha de Conexión al Siguiente Bloque
+        if (idx < bloquesElegidos.length - 1) {
+          const nextId = bloquesElegidos[idx + 1];
+          const nextEvento = logEventos.find(e => e.idEvento === nextId);
+          // La flecha es roja si el bloque origen está comprometido y afectó al siguiente
+          const enlaceRoto = !esValido || (nextEvento && nextEvento.esValido === false);
+
+          const startX = x + blockWidth;
+          const endX = gap + (idx + 1) * (blockWidth + gap);
+          const arrowY = startY + blockHeight / 2;
+
+          const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+          line.setAttribute("x1", startX);
+          line.setAttribute("y1", arrowY);
+          line.setAttribute("x2", endX - 8);
+          line.setAttribute("y2", arrowY);
+          line.setAttribute("class", `svg-arrow-line ${enlaceRoto ? 'compromised-arrow' : ''}`);
+          line.setAttribute("marker-end", `url(#arrowhead-${enlaceRoto ? 'red' : 'green'})`);
+
+          svg.appendChild(line);
+
+          // Texto sobre la flecha (Hash de alimentación)
+          const textLink = document.createElementNS("http://www.w3.org/2000/svg", "text");
+          textLink.setAttribute("x", (startX + endX) / 2);
+          textLink.setAttribute("y", arrowY - 6);
+          textLink.setAttribute("text-anchor", "middle");
+          textLink.setAttribute("font-family", "Fira Code");
+          textLink.setAttribute("font-size", "7.5px");
+          textLink.setAttribute("fill", enlaceRoto ? "#e74c3c" : "#1a3a5c");
+          textLink.setAttribute("font-weight", "600");
+          textLink.textContent = enlaceRoto ? "⚠️ ROTO" : "hashAnterior";
+          svg.appendChild(textLink);
+        }
+      });
+    }
+
+    // 5. VALIDACIÓN DEL LOG ENTERO EN TIEMPO REAL
+    async function validarCadenaLog() {
+      if (logEventos.length === 0) return;
+
+      // El hash anterior inicial esperado para el bloque 1
+      let hashEsperado = "0x" + "0".repeat(64);
+      let cadenaComprometida = false;
+      let contadorAfectados = 0;
+
+      for (let i = 0; i < logEventos.length; i++) {
+        const evento = logEventos[i];
+        
+        // 1. Verificación lógica: ¿coincide el hashAnterior con el previo de la cadena?
+        const coincideHashPrevio = (evento.hashAnterior === hashEsperado);
+
+        // 2. Verificación criptográfica real (SHA-256)
+        const hashRecalculado = await calcularSHA256(evento);
+        const coincideHashActual = (hashRecalculado === evento.hashEvento);
+
+        // 3. Verificación de firma (Simulada según el ataque de suplantación)
+        const firmaValida = (evento.firmaValida !== false);
+
+        if (!coincideHashPrevio || !coincideHashActual || !firmaValida) {
+          cadenaComprometida = true;
+          evento.esValido = false;
+          contadorAfectados++;
+
+          if (!coincideHashPrevio) {
+            evento.mensajeFalla = "CADENA ROTA";
+          } else if (!coincideHashActual) {
+            evento.mensajeFalla = "DATOS ALTERADOS";
+          } else {
+            evento.mensajeFalla = "FIRMA INVÁLIDA";
+          }
+        } else {
+          evento.esValido = true;
+          evento.mensajeFalla = null;
+        }
+
+        // El hash esperado para el siguiente es el hash de este evento
+        // NOTA: Si los datos del evento cambiaron, el hash que se propaga es el modificado en memoria,
+        // pero la cadena se rompe porque el siguiente evento tiene grabado físicamente el hash anterior original.
+        hashEsperado = evento.hashEvento;
+      }
+
+      // Actualizar la interfaz del status global
+      const statusGlobal = document.getElementById("globalStatus");
+      const statusGlobalIcon = document.getElementById("globalStatusIcon");
+      const statusGlobalText = document.getElementById("globalStatusText");
+
+      if (cadenaComprometida) {
+        statusGlobal.className = "status-bar comprometida";
+        statusGlobalIcon.textContent = "⚠️";
+        statusGlobalText.textContent = `Cadena comprometida — ${contadorAfectados} eventos afectados`;
+        
+        // Actualizar caja de mensajes de alerta
+        const msgBox = document.getElementById("attackMessageBox");
+        msgBox.className = "attack-message-box active-error";
+      } else {
+        statusGlobal.className = "status-bar integra";
+        statusGlobalIcon.textContent = "✓";
+        statusGlobalText.textContent = `Cadena íntegra — ${logEventos.length}/${logEventos.length} eventos verificados`;
+
+        // Restablecer caja de mensajes
+        const msgBox = document.getElementById("attackMessageBox");
+        msgBox.className = "attack-message-box";
+        document.getElementById("msgTitle").textContent = "🔬 Estado del Monitoreo";
+        document.getElementById("msgBody").textContent = "Sistema operativo sin anomalías. Todos los bloques se validan correctamente contra el registro centralizado del CRIQ.";
+      }
+    }
+
+    // 6. CONTROLADOR DE ATAQUES DEL SIMULADOR
+    async function simularAtaque(tipo) {
+      ataqueActivo = tipo;
+      
+      // Reiniciamos a una base íntegra y luego inyectamos el vector de ataque específico
+      await inicializarCadena(true);
+
+      // Desmarcar botones activos
+      document.querySelectorAll(".btn-attack").forEach(b => b.classList.remove("active"));
+      
+      const msgTitle = document.getElementById("msgTitle");
+      const msgBody = document.getElementById("msgBody");
+      
+      // Flujo de pasos de demo
+      desmarcarPasosNarrativa();
+
+      if (tipo === 'alterar') {
+        document.getElementById("btnAlterar").classList.add("active");
+        marcarPasoNarrativa('step3'); // Lanzar Ataque
+        marcarPasoNarrativa('step4'); // Detección
+        
+        // Inyectamos alteración de datos en el Evento 6
+        const ev6 = logEventos.find(e => e.idEvento === 6);
+        if (ev6) {
+          ev6.datosCita = "PACIENTE_HACKEADO: Cita Robada";
+          // Mantenemos el 'hashEvento' original grabado para forzar la discrepancia en la verificación real
+        }
+
+        msgTitle.textContent = "⚠️ ALERTA: Alteración de Registro Detectada";
+        msgBody.innerHTML = `<strong>Ataque:</strong> Modificación del contenido del Evento #6.
+                            <br><strong>Explicación:</strong> El hash calculado en tiempo real ya no coincide con el sello digital almacenado en el bloque. El blockchain detectó el intento de hackeo inmediatamente.`;
+      } 
+      
+      else if (tipo === 'suplantar') {
+        document.getElementById("btnSuplantar").classList.add("active");
+        marcarPasoNarrativa('step3');
+        marcarPasoNarrativa('step4');
+
+        // Agregamos un Evento #16 falso
+        const hashPrevio = logEventos[logEventos.length - 1].hashEvento;
+        const eventoFalso = {
+          idEvento: 16,
+          timestamp: Math.floor(Date.now() / 1000),
+          tipoAccion: "CREAR",
+          idUsuario: "MEDICO1",
+          rolUsuario: "MEDICO",
+          datosCita: "SUPLANTADO: Inyección Maliciosa",
+          hashAnterior: hashPrevio,
+          hashEvento: "0xab12cd34ef567890feac890123456789abcdef0123456789abcdef0123456789",
+          firmaValida: false // Forzamos falla de firma
+        };
+        logEventos.push(eventoFalso);
+
+        // Agregamos firma ficticia para el bloque 16
+        SIMULATED_SIGNATURES[15] = {
+          r: "0x9999999999999999999999999999999999999999999999999999999999999999",
+          s: "0x8888888888888888888888888888888888888888888888888888888888888888"
+        };
+
+        msgTitle.textContent = "⚠️ ALERTA: Firma Digital Inválida";
+        msgBody.innerHTML = `<strong>Ataque:</strong> Intento de suplantar la identidad de MEDICO1.
+                            <br><strong>Explicación:</strong> El sistema matemático ECDSA verificó la clave pública de MEDICO1 contra la firma real recibida y determinó que fue firmada por RECEPCION1. La firma es matemáticamente inválida para ese usuario.`;
+      } 
+      
+      else if (tipo === 'eliminar') {
+        document.getElementById("btnEliminar").classList.add("active");
+        marcarPasoNarrativa('step3');
+        marcarPasoNarrativa('step4');
+
+        // Eliminamos el evento 7 (índice 6) de la vista logEventos
+        logEventos.splice(6, 1);
+
+        msgTitle.textContent = "⚠️ ALERTA: Quiebre de Enlace en la Cadena";
+        msgBody.innerHTML = `<strong>Ataque:</strong> Eliminación física del Evento #7.
+                            <br><strong>Explicación:</strong> El Evento #8 declara en su cabecera que su <em>hashAnterior</em> debería ser el del Evento #7, pero el evento inmediatamente anterior ahora es el #6. La cadena de custodia digital está rota.`;
+      } 
+      
+      else if (tipo === 'reordenar') {
+        document.getElementById("btnReordenar").classList.add("active");
+        marcarPasoNarrativa('step3');
+        marcarPasoNarrativa('step4');
+
+        // Intercambiar Evento 1 y 2
+        const temp = logEventos[0];
+        logEventos[0] = logEventos[1];
+        logEventos[1] = temp;
+
+        msgTitle.textContent = "⚠️ ALERTA: Alteración de Secuencia Cronológica";
+        msgBody.innerHTML = `<strong>Ataque:</strong> Intercambio de orden entre Evento #1 y Evento #2.
+                            <br><strong>Explicación:</strong> Al alterar el orden, el <em>hashAnterior</em> guardado en el bloque #2 (que ahora es primero) no concuerda con el valor inicial de la cadena (0x00...0). La secuencia criptográfica se invalida.`;
+      }
+
+      // Volver a evaluar el log y redibujar
+      await validarCadenaLog();
+      renderLog();
+    }
+
+    // Restaura el estado original
+    async function restaurarTodo() {
+      ataqueActivo = null;
+      document.querySelectorAll(".btn-attack").forEach(b => b.classList.remove("active"));
+      
+      desmarcarPasosNarrativa();
+      marcarPasoNarrativa('step1');
+      marcarPasoNarrativa('step2');
+      marcarPasoNarrativa('step5');
+      marcarPasoNarrativa('step6');
+
+      await inicializarCadena(true);
+      await validarCadenaLog();
+      renderLog();
+    }
+
+    // Control de Guía de Demostración
+    function desmarcarPasosNarrativa() {
+      document.querySelectorAll(".guide-step").forEach(s => s.classList.remove("active"));
+    }
+    
+    function marcarPasoNarrativa(stepId) {
+      const el = document.getElementById(stepId);
+      if (el) el.classList.add("active");
+    }
+
+    // 7. INICIALIZACIÓN DE LA PÁGINA
+    window.onload = async () => {
+      // Cargamos y calculamos hashes Web Crypto reales
+      await inicializarCadena(true);
+      await validarCadenaLog();
+      renderLog();
+
+      // Añadir interactividad de pasos al hacer click en la guía del video
+      document.querySelectorAll(".guide-step").forEach(step => {
+        step.addEventListener("click", () => {
+          desmarcarPasosNarrativa();
+          step.classList.add("active");
+        });
+      });
+    };
+  </script>
+</body>
+</html>
